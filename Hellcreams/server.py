@@ -42,3 +42,4 @@ client_soc.sendall(msg.encode(encoding='utf-8'))  # 에코메세지 클라이언
 
 time.sleep(5)
 server_socket.close()  # 사용했던 서버 소켓을 닫아줌
+

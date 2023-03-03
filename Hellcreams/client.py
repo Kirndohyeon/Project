@@ -19,3 +19,4 @@ msg = data.decode()  # 읽은 데이터 디코딩
 print('echo msg:', msg)
 
 socket.close()
+
