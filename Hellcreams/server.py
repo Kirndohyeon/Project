@@ -30,14 +30,17 @@ print('connected client addr:', addr)
 
 # recv(메시지크기): 소켓에서 크기만큼 읽는 함수
 # 소켓에 읽을 데이터가 없으면 생길 때까지 대기함
-data = client_soc.recv(4)
+data = client_soc.recv(9)
 msg = data.decode()  # 읽은 데이터 디코딩
 read_byte = int(msg)
 print("expected msg bytes:", read_byte)
 
 data = client_soc.recv(read_byte)
-msg = data.decode()
-print('recv msg:', msg)
+f = open("./recv_image.jpg", "wb")
+f.write(data)
+f.close()
+
+msg = "Transmission Complete."
 client_soc.sendall(msg.encode(encoding='utf-8'))  # 에코메세지 클라이언트로 보냄
 
 time.sleep(5)
