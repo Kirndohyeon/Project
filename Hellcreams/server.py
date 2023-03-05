@@ -1,47 +1,49 @@
 import socket
 import time
+import shutil
 
-host = 'localhost'  # 서버 컴퓨터의 ip(여기선 내 컴퓨터를 서버 컴퓨터로 사용)
+host = 'localhost'  # localhost or IPv4 address
 port = 3333
 
 # socket.AF_INET: 주소종류 지정(IP) / socket.SOCK_STREAM: 통신종류 지정(UDP, TCP)
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-# 여러번 ip.port를 바인드하면 에러가 나므로, 이를 방지하기 위한 설정이 필요
-# socket.SOL_SOCKET: 소켓 옵션
-# SO_REUSEADDR 옵션은 현재 사용 중인 ip/포트번호를 재사용할 수 있다.
-# 커널이 소켓을 사용하는 중에도 계속해서 사용할 수 있다
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-# server socket에 ip와 port를 붙여줌(바인드)
 server_socket.bind((host, port))
-
-# 클라이언트 접속 준비 완료
 server_socket.listen()
 
-print('echo server start')  # echo program: 입력한 값을 메아리치는 기능(그대로 다시 보냄)
-
-# accept(): 클라이언트 접속 기다리며 대기
-# 클라이언트가 접속하면 서버-클라이언트 1:1 통신이 가능한 작은 소켓(client_soc)을 만들어서 반환
-# 접속한 클라이언트의 주소(addr) 역시 반환
 client_soc, addr = server_socket.accept()
 
 print('connected client addr:', addr)
 
-# recv(메시지크기): 소켓에서 크기만큼 읽는 함수
+# recv(메시지크기): 소켓에서 크기만큼 읽는 함수 / 엔터 누르고 끝나면 나머지는 무시 (C하고 구조가 좀 다른듯)
 # 소켓에 읽을 데이터가 없으면 생길 때까지 대기함
+
+# 사진 파일 받기
 data = client_soc.recv(9)
 msg = data.decode()  # 읽은 데이터 디코딩
 read_byte = int(msg)
 print("expected msg bytes:", read_byte)
 
+# 파일 저장 (확인용, 필요하지 않으면 지워도 됨)
 data = client_soc.recv(read_byte)
-f = open("./recv_image.jpg", "wb")
+f = open("./recv_server_image.jpg", "wb")
 f.write(data)
 f.close()
 
-msg = "Transmission Complete."
-client_soc.sendall(msg.encode(encoding='utf-8'))  # 에코메세지 클라이언트로 보냄
+# 여기에 가공할 코드 추가하기 (필요에 따라 수정해도 됨)
+pass
+
+f = open("./send_server_image.jpg", "wb")
+f.write(data)
+f.close()
+
+# 가공한 사진 파일 보내기
+msg_length = "0" * (9 - int(str(len(data)))) + str(len(data))
+
+client_soc.sendall(msg_length.encode(encoding='utf-8'))
+client_soc.sendall(data)
+
+print("Transmission Complete.")
 
 time.sleep(5)
 server_socket.close()  # 사용했던 서버 소켓을 닫아줌
