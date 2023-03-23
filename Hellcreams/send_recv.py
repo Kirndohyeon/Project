@@ -1,5 +1,24 @@
 import socket
 
+
+class TCPConnect:
+    def __init__(self, *, ip, port):
+        self.ip = ip
+        self.port = port
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    def __del__(self):
+        self.socket.close()
+
+
+class TCPClient(TCPConnect):
+    def __init__(self, *, ip, port):
+        super(TCPClient, self).__init__()
+
+
+
+
+
 class TcpConnect:
     def __init__(self, *, ip, port):
         self.ip = ip
@@ -27,14 +46,11 @@ class TcpConnect:
         self.socket.listen()
         return self.socket.accept()
 
-    def send_image(self, directory):
-        f = open(directory, "rb")
-        send_image = f.read()
-        f.close()
-        msg_length = "0" * (9 - int(str(len(send_image)))) + str(len(send_image))
+    def send_image(self, image_file):
+        msg_length = "0" * (9 - int(str(len(image_file)))) + str(len(image_file))
 
         self.socket.sendall(msg_length.encode(encoding='utf-8'))
-        self.socket.sendall(send_image)
+        self.socket.sendall(image_file)
 
     def send_string(self, msg):
         msg_length = "0" * (9 - int(str(len(msg)))) + str(len(msg))
