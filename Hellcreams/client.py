@@ -1,10 +1,14 @@
 import send_recv
 
-socket = send_recv.TcpConnect(ip="localhost", port=17392)
-socket.client_connect()
+socket = send_recv.TCPClient(ip="localhost", port=17392)
+socket.connect()
 
 f = open("./send_client_image.jpg", "rb")
 data = f.read()
 socket.send_image(data)
-a = socket.client_recv()
-print("recv file is", "" if a is None else "not", "None")
+f.close()
+
+a = socket.recv()
+f = open("./recv_client_image.jpg", "wb")
+f.write(a)
+f.close()

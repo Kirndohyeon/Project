@@ -1,10 +1,10 @@
 import send_recv
 
-socket = send_recv.TcpConnect(ip="localhost", port=17392)
-socket.server_open()
+socket = send_recv.TCPServer(ip="localhost", port=17392)
+socket.open()
 
-client, _ = socket.server_listen()
-a = socket.server_recv(client)
-socket.send_image()
+socket.listen()
+a = socket.recv()
+socket.send_image(a)
 
 print("Work done.")

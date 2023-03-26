@@ -1,5 +1,4 @@
 import socket
-from collections import deque
 
 
 class TCPConnect:
@@ -14,13 +13,13 @@ class TCPConnect:
 
 class TCPClient(TCPConnect):
     def __init__(self, *, ip, port):
-        super(TCPClient, self).__init__()
+        super().__init__(ip=ip, port=port)
 
     def __del__(self):
-        super(TCPClient, self).__del__()
+        super().__del__()
 
     def connect(self):
-        self.socket.connect(self.ip, self.port)
+        self.socket.connect((self.ip, self.port))
 
     def send_image(self, image_file):
         msg_length = "0" * (9 - int(str(len(image_file)))) + str(len(image_file))
@@ -39,14 +38,14 @@ class TCPClient(TCPConnect):
         return self.socket.recv(read_byte)
 
 
-
-
 class TCPServer(TCPConnect):
     def __init__(self, *, ip, port):
-        super(TCPServer, self).__init__()
+        super().__init__(ip=ip, port=port)
+        self.client_conn = None
+        self.client_addr = None
 
     def __del__(self):
-        super(TCPServer, self).__del__()
+        super().__del__()
 
     def open(self):
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -54,17 +53,21 @@ class TCPServer(TCPConnect):
 
     def listen(self):
         self.socket.listen()
-        return self.socket.accept()
+        self.client_conn, self.client_addr = self.socket.accept()
 
-    def send_image(self, target_client, image_file):
+    def send_image(self, image_file):
         msg_length = "0" * (9 - int(str(len(image_file)))) + str(len(image_file))
-        target_client.send(msg_length.encode(encoding="utf-8"))
-        target_client.socket.send(image_file)
+        self.client_conn.send(msg_length.encode(encoding="utf-8"))
+        self.client_conn.send(image_file)
 
     def send_string(self, msg):
-        pass
+        msg_length = "0" * (9 - int(str(len(msg)))) + str(len(msg))
+        self.client_conn.send(msg_length.encode(encoding="utf-8"))
+        self.client_conn.send(msg)
 
     def recv(self):
-        pass
-
+        data = self.client_conn.recv(9)
+        msg = data.decode()
+        read_byte = int(msg)
+        return self.client_conn.recv(read_byte)
 
