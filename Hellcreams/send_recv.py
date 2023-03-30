@@ -8,7 +8,10 @@ class TCPConnect:
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def __del__(self):
-        self.socket.close()
+        try:
+            self.socket.close()
+        except NameError:
+            pass
 
 
 class TCPClient(TCPConnect):
