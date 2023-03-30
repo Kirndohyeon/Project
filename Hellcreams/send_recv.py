@@ -70,4 +70,3 @@ class TCPServer(TCPConnect):
         msg = data.decode()
         read_byte = int(msg)
         return self.client_conn.recv(read_byte)
-
