@@ -11,5 +11,5 @@ ref.update({
     "phew":
         {"email": "qery@phew.com",
          "id": "seki",
-         "password":"alali"}
+         "password": "alali"}
 })
